@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/your-repo.git'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'echo Running tests...'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t myapp:${BUILD_NUMBER} .'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                ssh ubuntu@EC2_IP "bash devops/scripts/deploy.sh myapp:${BUILD_NUMBER}"
+                '''
+            }
+        }
+    }
+}
